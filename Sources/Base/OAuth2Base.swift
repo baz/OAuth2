@@ -190,7 +190,7 @@ open class OAuth2Base: OAuth2Securable {
 		return authURL.description
 	}
 	
-	override func updateFromKeychainItems(_ items: [String: Any]) {
+	override open func updateFromKeychainItems(_ items: [String: Any]) {
 		for message in clientConfig.updateFromStorableItems(items) {
 			logger?.debug("OAuth2", msg: message)
 		}
@@ -313,7 +313,7 @@ open class OAuth2Base: OAuth2Securable {
 	open func assureNoErrorInResponse(_ params: OAuth2JSON, fallback: String? = nil) throws {
 		
 		// "error_description" is optional, we prefer it if it's present
-		if let err_msg = params["error_description"] as? String {
+		if let err_msg = params["error_description"] as? String, err_msg.count > 0 {
 			throw OAuth2Error.responseError(err_msg)
 		}
 		
@@ -471,7 +471,7 @@ open class OAuth2ContextStore {
 	open var state: String {
 		if _state.isEmpty {
 			_state = UUID().uuidString
-			_state = _state[_state.startIndex..<_state.index(_state.startIndex, offsetBy: 8)]		// only use the first 8 chars, should be enough
+			_state = String(_state[_state.startIndex..<_state.index(_state.startIndex, offsetBy: 8)])        // only use the first 8 chars, should be enough
 		}
 		return _state
 	}
